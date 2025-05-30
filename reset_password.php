@@ -3,13 +3,13 @@ require 'config.php';
 
 $token = $_GET['token'] ?? '';
 $msg = '';
+$error = '';
 
-// Validar si el token fue proporcionado
 if (!$token) {
     die("Token no proporcionado.");
 }
 
-// Buscar el usuario con ese token y que no esté expirado
+// Validar el token y su vencimiento
 $stmt = $conn->prepare("SELECT * FROM users WHERE reset_token = ? AND reset_expires > NOW()");
 $stmt->execute([$token]);
 $user = $stmt->fetch();
@@ -18,18 +18,18 @@ if (!$user) {
     die("Token inválido o expirado.");
 }
 
-// Si el formulario fue enviado, actualizar la contraseña
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_password = $_POST['password'];
+    $password = $_POST['password'];
+    $confirm = $_POST['confirm'];
 
-    if (strlen($new_password) < 6) {
-        $msg = "La contraseña debe tener al menos 6 caracteres.";
+    if ($password !== $confirm) {
+        $error = "Las contraseñas no coinciden.";
+    } elseif (strlen($password) < 6) {
+        $error = "La contraseña debe tener al menos 6 caracteres.";
     } else {
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?");
-        $stmt->execute([$hashed_password, $user['id']]);
-
+        $stmt->execute([$hash, $user['id']]);
         $msg = "Contraseña actualizada correctamente. <a href='index.php'>Iniciar sesión</a>";
     }
 }
@@ -38,17 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Restablecer Contraseña</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 </head>
 <body>
-    <h2>Restablecer Contraseña</h2>
-    <?php if ($msg): ?>
-        <p><?= $msg ?></p>
-    <?php else: ?>
-        <form method="post">
-            <label>Nueva contraseña:</label><br>
-            <input type="password" name="password" required placeholder="Nueva contraseña"><br><br>
-            <button type="submit">Actualizar contraseña</button>
-        </form>
-    <?php endif; ?>
+<h2>Restablecer Contraseña</h2>
+
+<?php if ($error): ?><p style="color:red"><?= $error ?></p><?php endif; ?>
+<?php if ($msg): ?>
+    <p><?= $msg ?></p>
+<?php else: ?>
+<form method="post">
+    <input type="password" name="password" required placeholder="Nueva contraseña"><br>
+    <input type="password" name="confirm" required placeholder="Confirmar contraseña"><br>
+    <button type="submit">Cambiar contraseña</button>
+</form>
+<?php endif; ?>
+
 </body>
 </html>
