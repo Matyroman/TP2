@@ -1,3 +1,40 @@
+<?php
+require 'config.php';
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Correo inválido.";
+    } elseif ($password !== $confirm_password) {
+        $error = "Las contraseñas no coinciden.";
+    } elseif (strlen($password) < 6) {
+        $error = "La contraseña debe tener al menos 6 caracteres.";
+    } else {
+        // Verificar si ya existe el email
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $error = "El correo ya está registrado.";
+        } else {
+            // Insertar usuario con password hasheada
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+            if ($stmt->execute([$email, $password_hash])) {
+                $success = "Registro exitoso. Ahora puedes iniciar sesión.";
+            } else {
+                $error = "Error al registrar usuario.";
+            }
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
