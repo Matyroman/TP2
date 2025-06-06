@@ -56,8 +56,8 @@ if (!isset($_SESSION['access_token']) && !isset($_SESSION['user_email_address'])
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center">Iniciar Sesión</h2>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Iniciar Sesión</h2>
 
         <!-- Login tradicional -->
         <form method="post" class="mb-4">
@@ -87,3 +87,4 @@ if (!isset($_SESSION['access_token']) && !isset($_SESSION['user_email_address'])
     </div>
 </body>
 </html>
+
