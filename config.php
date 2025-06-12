@@ -12,10 +12,10 @@ require_once 'vendor/autoload.php';
 $google_client = new Google_Client();
 
 //Set the OAuth 2.0 Client ID | Copiar "Aqui tu ID DE CLIENTE"
-$google_client->setClientId('113200675580-2kav2aluqirvm4r1vf4cqvprds0u52am.apps.googleusercontent');
+$google_client->setClientId('113200675580-2kav2aluqirvm4r1vf4cqvprds0u52am.apps.googleusercontent.com');
 
 //Set the OAuth 2.0 Client Secret key Aqui tu CLAVE
-$google_client->setClientSecret('CSPX-5M0VM2zFJweasupB_OsFl9lhd9s1');
+$google_client->setClientSecret('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');
 
 //Set the OAuth 2.0 Redirect URI | URL AUTORIZADO
 $google_client->setRedirectUri('http://localhost/TP2/google-login/index.php');
